@@ -6,11 +6,31 @@ const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
 
 // Initialize Firebase Admin
-admin.initializeApp();
+let firebaseConfig = { projectId: 'expiryguard-8c527' };
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+  try {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    firebaseConfig.credential = admin.credential.cert(serviceAccount);
+  } catch (e) {
+    console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT JSON", e);
+  }
+} else {
+    // Attempt default initialization if env var is missing
+    console.warn("FIREBASE_SERVICE_ACCOUNT env var is missing. Firestore writes may fail.");
+}
+admin.initializeApp(firebaseConfig);
 
 const app = express();
+// Trust Render's proxy so rate-limiting works correctly based on actual client IP
+app.set('trust proxy', 1);
+
 app.use(cors({ origin: true }));
 app.use(express.json());
+
+// Ping endpoint to keep the server awake
+app.get('/ping', (req, res) => {
+  res.status(200).send('pong');
+});
 
 // 1. Rate Limiting (Feature Abuse Prevention)
 // Max 10 requests per minute per IP for payment endpoints

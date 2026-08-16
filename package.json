@@ -1,0 +1,16 @@
+{
+  "name": "expiryguard-backend",
+  "version": "1.0.0",
+  "description": "Express Backend for ExpiryGuard payments",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "firebase-admin": "^12.1.1",
+    "razorpay": "^2.9.4",
+    "express-rate-limit": "^7.3.1"
+  }
+}
